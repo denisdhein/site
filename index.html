@@ -1,126 +1,47 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="utf-8" />
-  <title>Você me daria um beijo?</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comi o Hiago Hoje</title>
   <style>
-    :root{
-      --bg:#0b1020; --card:#111936; --txt:#eef3ff; --accent:#ff6ea6; --ok:#34d399;
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: white;
     }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: radial-gradient(60% 60% at 20% 20%, #182245 0, #0b1020 60%);
-      color:var(--txt);
-      min-height:100dvh; display:grid; place-items:center; overflow:hidden;
+    .container {
+      text-align: center;
+      padding: 40px;
+      border-radius: 20px;
+      background: rgba(0, 0, 0, 0.4);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      animation: fadeIn 2s ease-in-out;
     }
-    .card{
-      background:var(--card); border:1px solid rgba(255,255,255,.12);
-      border-radius:20px; padding:32px 28px; width:min(560px, 92%); text-align:center;
-      box-shadow:0 20px 60px rgba(0,0,0,.35);
-      position:relative;
+    h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
     }
-    h1{font-size:clamp(22px, 4.2vw, 34px); line-height:1.2}
-    .heart{color:var(--accent)}
-    .actions{
-      margin-top:22px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;
+    p {
+      font-size: 1.2em;
+      opacity: 0.9;
     }
-    button{
-      border:0; cursor:pointer; border-radius:12px; padding:12px 18px; font-weight:800;
-      background:#202a55; color:var(--txt); transition:.18s transform;
-      box-shadow:0 8px 24px rgba(0,0,0,.25);
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
     }
-    button:hover{ transform:translateY(-2px) }
-    .yes{ background:var(--ok); color:#052 }
-    .floating{
-      position:absolute; inset:auto; /* será posicionado via JS quando "fugir" no mobile */
-    }
-    .msg{margin-top:18px; color:#a7b7ff; min-height:1.2em}
-    footer{margin-top:18px; font-size:12px; color:#9fb0ff66}
   </style>
 </head>
 <body>
-  <main class="card" id="card">
-    <h1>Você me daria um beijo? <span class="heart">💋</span></h1>
-
-    <div class="actions" id="actions">
-      <button class="yes" id="btnYes">SIM</button>
-      <button id="btnNo">NÃO</button>
-    </div>
-
-    <p class="msg" id="msg"></p>
-    <footer>(tenta clicar no “NÃO” 😏)</footer>
-  </main>
-
-  <script>
-    const btnYes = document.getElementById('btnYes');
-    const btnNo = document.getElementById('btnNo');
-    const actions = document.getElementById('actions');
-    const msg = document.getElementById('msg');
-    const card = document.getElementById('card');
-
-    // Troca de lugar quando o mouse entra no "NÃO"
-    btnNo.addEventListener('mouseenter', swapButtons);
-    // Também quando ele tenta focar via teclado
-    btnNo.addEventListener('focus', swapButtons);
-
-    function swapButtons(){
-      // Pega a ordem atual dos botões
-      const children = [...actions.children];
-      const idxYes = children.indexOf(btnYes);
-      const idxNo = children.indexOf(btnNo);
-      // Inverte
-      if (idxNo > idxYes) actions.insertBefore(btnNo, btnYes);
-      else actions.insertBefore(btnYes, btnNo);
-    }
-
-    // Mensagem fofinha pro "SIM"
-    btnYes.addEventListener('click', ()=>{
-      msg.textContent = 'Aeeee! Eu sabia 😍';
-      confetti(); // mini confete bobinho sem libs
-    });
-
-    // Em telas touch (mobile), o “NÃO” foge pra uma posição aleatória dentro do card
-    const isTouch = matchMedia('(pointer: coarse)').matches;
-    if (isTouch) {
-      btnNo.classList.add('floating');
-      btnNo.addEventListener('touchstart', e=>{
-        e.preventDefault();
-        moveNoRandom();
-      }, {passive:false});
-    }
-
-    function moveNoRandom(){
-      const pad = 8;
-      const rect = card.getBoundingClientRect();
-      const btnRect = btnNo.getBoundingClientRect();
-      const maxX = rect.width - btnRect.width - pad*2;
-      const maxY = rect.height - btnRect.height - 60; // evita cobrir o título
-      const x = Math.max(pad, Math.random()*maxX);
-      const y = Math.max(pad+48, Math.random()*maxY + 48);
-      btnNo.style.left = x + 'px';
-      btnNo.style.top  = y + 'px';
-    }
-
-    // Confete simples (sem libs)
-    function confetti(){
-      for (let i=0;i<24;i++){
-        const s = document.createElement('span');
-        s.textContent = '💖';
-        s.style.position='fixed';
-        s.style.left = (50 + (Math.random()*40-20)) + 'vw';
-        s.style.top = '-10vh';
-        s.style.fontSize = (14 + Math.random()*12) + 'px';
-        s.style.transition = 'transform 1.2s ease, opacity 1.2s ease';
-        document.body.appendChild(s);
-        requestAnimationFrame(()=>{
-          s.style.transform = `translate(${(Math.random()*60-30)}vw, 115vh) rotate(${Math.random()*720-360}deg)`;
-          s.style.opacity = '0';
-        });
-        setTimeout(()=>s.remove(), 1300);
-      }
-    }
-  </script>
+  <div class="container">
+    <h1>Comi o Hiago Hoje</h1>
+    <p>😏 Foi registrado com estilo em HTML</p>
+  </div>
 </body>
 </html>
